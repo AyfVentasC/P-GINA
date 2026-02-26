@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Mi Agenda con Checkbox</title>
+    <title>Agenda de Actividades</title>
     <style>
         body { 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
@@ -42,37 +42,35 @@
             outline: none; font-size: 16px; padding: 5px; font-family: inherit;
         }
         
-        .hora-bloque { display: flex; border-bottom: 1px solid #eee; padding: 8px 0; }
+        .hora-bloque { display: flex; border-bottom: 1px solid #eee; padding: 12px 0; align-items: center; }
         .hora-label { width: 80px; font-weight: bold; color: #2c3e50; }
-        .lineas-escritura { flex-grow: 1; }
         
-        /* Contenedor de línea con checkbox */
         .linea-wrapper {
+            flex-grow: 1;
             display: flex;
             align-items: center;
-            gap: 10px;
-            margin-bottom: 4px;
-        }
-
-        .checkbox-visto {
-            width: 18px;
-            height: 18px;
-            cursor: pointer;
-            accent-color: #28a745;
+            gap: 15px;
         }
 
         .linea { 
             flex-grow: 1;
             border-bottom: 1px solid #e0e0e0; 
-            height: 28px; 
+            height: 30px; 
             outline: none; 
+            font-size: 16px;
             transition: all 0.3s;
         }
 
-        /* Estilo cuando la tarea está marcada */
+        .checkbox-visto {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: #28a745;
+        }
+
         .completado {
+            color: #bbb;
             text-decoration: line-through;
-            color: #aaa;
         }
 
         .controles {
@@ -102,7 +100,6 @@
             body { background: white; padding: 0; }
             .controles { display: none; }
             .agenda-container { box-shadow: none; border: none; margin: 0; page-break-after: always; }
-            .checkbox-visto { border: 1px solid #000; }
         }
     </style>
 </head>
@@ -117,7 +114,8 @@
 </div>
 
 <script>
-    const horas = ["08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00"];
+    // Horario ajustado hasta las 17:00
+    const horas = ["08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00"];
 
     function crearHoja() {
         const container = document.getElementById('hojas-container');
@@ -129,15 +127,9 @@
             filasHtml += `
                 <div class="hora-bloque">
                     <div class="hora-label">${hora}</div>
-                    <div class="lineas-escritura">
-                        <div class="linea-wrapper">
-                            <input type="checkbox" class="checkbox-visto" onchange="toggleCompletado(this); guardarDatos()">
-                            <div class="linea" contenteditable="true" oninput="guardarDatos()"></div>
-                        </div>
-                        <div class="linea-wrapper">
-                            <input type="checkbox" class="checkbox-visto" onchange="toggleCompletado(this); guardarDatos()">
-                            <div class="linea" contenteditable="true" oninput="guardarDatos()"></div>
-                        </div>
+                    <div class="linea-wrapper">
+                        <div class="linea" contenteditable="true" oninput="guardarDatos()"></div>
+                        <input type="checkbox" class="checkbox-visto" onchange="toggleCompletado(this); guardarDatos()">
                     </div>
                 </div>`;
         });
@@ -156,7 +148,7 @@
     }
 
     function toggleCompletado(checkbox) {
-        const linea = checkbox.nextElementSibling;
+        const linea = checkbox.previousElementSibling;
         if (checkbox.checked) {
             linea.classList.add('completado');
         } else {
@@ -177,11 +169,11 @@
             });
             hojas.push({ fecha, filas });
         });
-        localStorage.setItem('agenda_v3', JSON.stringify(hojas));
+        localStorage.setItem('agenda_final', JSON.stringify(hojas));
     }
 
     function cargarDatos() {
-        const datos = JSON.parse(localStorage.getItem('agenda_v3'));
+        const datos = JSON.parse(localStorage.getItem('agenda_final'));
         if (!datos || datos.length === 0) {
             crearHoja();
         } else {
@@ -203,8 +195,8 @@
     }
 
     function borrarTodo() {
-        if(confirm("¿Borrar todas las hojas y datos?")) {
-            localStorage.removeItem('agenda_v3');
+        if(confirm("¿Seguro que quieres borrar todas las hojas?")) {
+            localStorage.removeItem('agenda_final');
             location.reload();
         }
     }
