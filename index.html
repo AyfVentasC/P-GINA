@@ -2,206 +2,128 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Agenda de Actividades</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consulta de Tintas Epson | Guía Rápida</title>
     <style>
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            background-color: #000000; 
-            display: flex; 
-            flex-direction: column;
-            align-items: center; 
-            padding: 20px;
+        :root {
+            --epson-blue: #003399;
+            --accent: #ffcc00;
+            --bg: #f8f9fa;
+        }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: var(--bg);
             margin: 0;
+            padding: 20px;
         }
-        
-        .agenda-container { 
-            width: 210mm; 
-            min-height: 297mm;
-            background: white; 
-            padding: 20mm; 
+        .main-card {
+            max-width: 850px;
+            margin: auto;
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        h2 {
+            color: var(--epson-blue);
+            text-align: center;
+            border-bottom: 3px solid var(--accent);
+            padding-bottom: 10px;
+        }
+        .search-box {
+            width: 100%;
+            padding: 15px;
+            margin: 20px 0;
+            border: 2px solid #ddd;
+            border-radius: 50px;
+            font-size: 1.1em;
             box-sizing: border-box;
-            box-shadow: 0 0 20px rgba(255,255,255,0.1);
-            margin-bottom: 30px;
+            outline: none;
+            text-align: center;
         }
-
-        .header-area {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 2px solid #eee;
-            padding-bottom: 20px;
-            margin-bottom: 20px;
+        .search-box:focus {
+            border-color: var(--epson-blue);
         }
-
-        .header-texto h1 { color: #333; margin: 0; font-size: 28px; }
-        .logo-container img { max-width: 150px; height: auto; }
-
-        .fecha-seccion { margin-bottom: 30px; font-weight: bold; color: #555; }
-        .fecha-input { 
-            border: none; border-bottom: 1px solid #ccc; width: 250px; 
-            outline: none; font-size: 16px; padding: 5px; font-family: inherit;
+        table {
+            width: 100%;
+            border-collapse: collapse;
         }
-        
-        .hora-bloque { display: flex; border-bottom: 1px solid #eee; padding: 12px 0; align-items: center; }
-        .hora-label { width: 80px; font-weight: bold; color: #2c3e50; }
-        
-        .linea-wrapper {
-            flex-grow: 1;
-            display: flex;
-            align-items: center;
-            gap: 15px;
+        th {
+            background: var(--epson-blue);
+            color: white;
+            padding: 12px;
         }
-
-        .linea { 
-            flex-grow: 1;
-            border-bottom: 1px solid #e0e0e0; 
-            height: 30px; 
-            outline: none; 
-            font-size: 16px;
-            transition: all 0.3s;
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            text-align: center;
         }
-
-        .checkbox-visto {
-            width: 20px;
-            height: 20px;
-            cursor: pointer;
-            accent-color: #28a745;
-        }
-
-        .completado {
-            color: #bbb;
-            text-decoration: line-through;
-        }
-
-        .controles {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            z-index: 1000;
-        }
-
-        .btn {
-            padding: 12px 20px;
-            border: none;
+        .badge {
+            display: inline-block;
+            padding: 6px 15px;
             border-radius: 5px;
-            cursor: pointer;
             font-weight: bold;
-            text-transform: uppercase;
+            font-size: 1.1em;
         }
-
-        .btn-add { background: #28a745; color: white; }
-        .btn-print { background: #d4af37; color: black; }
-        .btn-clear { background: #dc3545; color: white; }
-
-        @media print {
-            body { background: white; padding: 0; }
-            .controles { display: none; }
-            .agenda-container { box-shadow: none; border: none; margin: 0; page-break-after: always; }
-        }
+        /* Colores por tipo de tinta */
+        .t544 { background-color: #e3f2fd; color: #0d47a1; border: 1px solid #0d47a1; }
+        .t504 { background-color: #fff3e0; color: #e65100; border: 1px solid #e65100; }
+        .t664 { background-color: #f1f8e9; color: #1b5e20; border: 1px solid #1b5e20; }
+        .tMixed { background-color: #f3e5f5; color: #4a148c; border: 1px solid #4a148c; }
+        
+        tr:hover { background-color: #fcfcfc; }
     </style>
 </head>
 <body>
 
-<div id="hojas-container"></div>
+<div class="main-card">
+    <h2>Buscador de Compatibilidad Epson</h2>
+    
+    <input type="text" id="inkSearch" class="search-box" placeholder="Busca tu modelo (ej: L3110) o el número de tinta...">
 
-<div class="controles">
-    <button class="btn btn-add" onclick="crearHoja()">+ Añadir Hoja</button>
-    <button class="btn btn-print" onclick="window.print()">Imprimir Todo</button>
-    <button class="btn btn-clear" onclick="borrarTodo()">Borrar Todo</button>
+    <table id="targetTable">
+        <thead>
+            <tr>
+                <th>Serie / Modelo Epson</th>
+                <th>Número de Tinta</th>
+                <th>Observación</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>L3110, L3150, L3210, L3250, L1110, L5190, L5290</td>
+                <td><span class="badge t544">544</span></td>
+                <td>EcoTank Estándar</td>
+            </tr>
+            <tr>
+                <td>L4150, L4160, L6161, L6171, L6191</td>
+                <td><span class="badge t504">504</span></td>
+                <td>Negro Pigmentada</td>
+            </tr>
+            <tr>
+                <td>L4260, L14150</td>
+                <td><span class="badge tMixed">504 / 544</span></td>
+                <td>Usa 504 (Bk) y 544 (C/M/Y)</td>
+            </tr>
+            <tr>
+                <td>L120, L210, L220, L355, L365, L375, L380, L395, L455, L555, L575, L1300</td>
+                <td><span class="badge t664">664</span></td>
+                <td>Modelos Anteriores</td>
+            </tr>
+        </tbody>
+    </table>
 </div>
 
 <script>
-    // Horario ajustado hasta las 17:00
-    const horas = ["08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00"];
-
-    function crearHoja() {
-        const container = document.getElementById('hojas-container');
-        const hoja = document.createElement('div');
-        hoja.className = 'agenda-container';
-
-        let filasHtml = '';
-        horas.forEach(hora => {
-            filasHtml += `
-                <div class="hora-bloque">
-                    <div class="hora-label">${hora}</div>
-                    <div class="linea-wrapper">
-                        <div class="linea" contenteditable="true" oninput="guardarDatos()"></div>
-                        <input type="checkbox" class="checkbox-visto" onchange="toggleCompletado(this); guardarDatos()">
-                    </div>
-                </div>`;
+    document.getElementById('inkSearch').addEventListener('keyup', function() {
+        let val = this.value.toUpperCase();
+        let rows = document.querySelectorAll('#targetTable tbody tr');
+        
+        rows.forEach(row => {
+            let text = row.innerText.toUpperCase();
+            row.style.display = text.includes(val) ? '' : 'none';
         });
-
-        hoja.innerHTML = `
-            <div class="header-area">
-                <div class="header-texto"><h1>Agenda de Actividades</h1></div>
-                <div class="logo-container"><img src="https://i.ibb.co/kVWh1gqX/image.png"></div>
-            </div>
-            <div class="fecha-seccion">DIA: <input type="text" class="fecha-input" placeholder="Escribe el día..." oninput="guardarDatos()"></div>
-            <div>${filasHtml}</div>
-        `;
-
-        container.appendChild(hoja);
-        return hoja;
-    }
-
-    function toggleCompletado(checkbox) {
-        const linea = checkbox.previousElementSibling;
-        if (checkbox.checked) {
-            linea.classList.add('completado');
-        } else {
-            linea.classList.remove('completado');
-        }
-    }
-
-    function guardarDatos() {
-        const hojas = [];
-        document.querySelectorAll('.agenda-container').forEach(hoja => {
-            const fecha = hoja.querySelector('.fecha-input').value;
-            const filas = [];
-            hoja.querySelectorAll('.linea-wrapper').forEach(wrapper => {
-                filas.push({
-                    texto: wrapper.querySelector('.linea').innerText,
-                    hecho: wrapper.querySelector('.checkbox-visto').checked
-                });
-            });
-            hojas.push({ fecha, filas });
-        });
-        localStorage.setItem('agenda_final', JSON.stringify(hojas));
-    }
-
-    function cargarDatos() {
-        const datos = JSON.parse(localStorage.getItem('agenda_final'));
-        if (!datos || datos.length === 0) {
-            crearHoja();
-        } else {
-            datos.forEach(d => {
-                const hoja = crearHoja();
-                hoja.querySelector('.fecha-input').value = d.fecha;
-                const wrappers = hoja.querySelectorAll('.linea-wrapper');
-                d.filas.forEach((item, i) => {
-                    if(wrappers[i]) {
-                        const linea = wrappers[i].querySelector('.linea');
-                        const check = wrappers[i].querySelector('.checkbox-visto');
-                        linea.innerText = item.texto;
-                        check.checked = item.hecho;
-                        if(item.hecho) linea.classList.add('completado');
-                    }
-                });
-            });
-        }
-    }
-
-    function borrarTodo() {
-        if(confirm("¿Seguro que quieres borrar todas las hojas?")) {
-            localStorage.removeItem('agenda_final');
-            location.reload();
-        }
-    }
-
-    window.onload = cargarDatos;
+    });
 </script>
 
 </body>
